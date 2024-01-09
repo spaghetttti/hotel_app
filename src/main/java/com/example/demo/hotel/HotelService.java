@@ -23,8 +23,7 @@ public class HotelService {
     }
 
     public Hotel getHotelById(@PathVariable Long id) {
-        return new Hotel(id, "Sample Hotel", "Sample Country", "Sample City", "Sample Street",
-                "123", 5, "testhotel@example.com", "123.456, 789.012", 4);
+        return hotelRepository.findById(id).orElseThrow();
     }
 
 
