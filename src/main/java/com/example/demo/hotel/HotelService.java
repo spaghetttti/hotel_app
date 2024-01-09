@@ -1,5 +1,6 @@
 package com.example.demo.hotel;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
@@ -37,11 +38,37 @@ public class HotelService {
     }
 
     public String deleteHotelById(Long id) {
-        boolean hotelExistsById = hotelRepository.existsById(id);
-        if (!hotelExistsById) {
+        Optional<Hotel> hotelToUpdate = hotelRepository.findById(id);
+        if (hotelToUpdate.isEmpty()) {
             throw new IllegalArgumentException("sorry mate, hotel with id of " + id + " doesn't exist");
         }
         hotelRepository.deleteById(id);
         return "Hotel deleted successfully";
+    }
+
+    @Transactional
+    public String updateHotel(Long id, Hotel hotelInfo) {
+        Optional<Hotel> hotelToUpdateOptional = hotelRepository.findById(id);
+        if (hotelToUpdateOptional.isEmpty()) {
+            throw new IllegalArgumentException("Sorry, hotel with id of " + id + " doesn't exist");
+        }
+
+        Hotel existingHotel = hotelToUpdateOptional.get();
+
+        Optional.ofNullable(hotelInfo.getName()).ifPresent(existingHotel::setName);
+        Optional.ofNullable(hotelInfo.getCountry()).ifPresent(existingHotel::setCountry);
+        Optional.ofNullable(hotelInfo.getCity()).ifPresent(existingHotel::setCity);
+        Optional.ofNullable(hotelInfo.getStreet()).ifPresent(existingHotel::setStreet);
+        Optional.ofNullable(hotelInfo.getNumber()).ifPresent(existingHotel::setNumber);
+        Optional.ofNullable(hotelInfo.getStarRating())
+                .filter(starRating -> starRating > 0 && starRating <= 5)
+                .ifPresent(existingHotel::setStarRating);
+        Optional.ofNullable(hotelInfo.getContactInfo()).ifPresent(existingHotel::setContactInfo);
+        Optional.ofNullable(hotelInfo.getGpsLocation()).ifPresent(existingHotel::setGpsLocation);
+        Optional.of(hotelInfo.getRoomsNumber()).ifPresent(existingHotel::setRoomsNumber);
+
+        hotelRepository.save(existingHotel); // Save the updated hotel
+
+        return "Hotel updated successfully";
     }
 }

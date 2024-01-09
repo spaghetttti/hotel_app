@@ -35,4 +35,9 @@ public class HotelController {
         return hotelService.deleteHotelById(id);
     }
 
+    @PutMapping(path = "/{id}")
+    public String updateHotel(@PathVariable Long id, @RequestBody Hotel hotelInfo) {
+        return hotelService.updateHotel(id, hotelInfo);
+    }
+
 }
