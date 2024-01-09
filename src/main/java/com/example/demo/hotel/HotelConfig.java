@@ -5,12 +5,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 @Configuration
 public class HotelConfig {
     @Bean
-    CommandLineRunner commandLineRunner(HotelRepository hotelRepository) {
+    CommandLineRunner commandLineRunnerHotelConfig(HotelRepository hotelRepository) {
         return args -> {
             ArrayList<Hotel> listOfHotels = new ArrayList<>();
             listOfHotels.add(new Hotel("Sample Hotel 1", "Country 1", "City 1", "Street 1", "123", 5, "hotel1@example.com", "123.456, 789.012", 5));
