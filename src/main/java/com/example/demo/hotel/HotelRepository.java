@@ -11,4 +11,6 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
     @Query("SELECT h from Hotel h WHERE h.contactInfo = ?1 OR h.gpsLocation = ?2")
     Optional<Hotel> findHotelByContactInfoOrGpsLocation(String contactInfo, String gpsLocation);
+
+
 }

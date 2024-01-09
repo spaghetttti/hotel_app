@@ -35,4 +35,13 @@ public class HotelService {
         hotelRepository.save(newHotel);
         return "new hotel has been created";
     }
+
+    public String deleteHotelById(Long id) {
+        boolean hotelExistsById = hotelRepository.existsById(id);
+        if (!hotelExistsById) {
+            throw new IllegalArgumentException("sorry mate, hotel with id of " + id + " doesn't exist");
+        }
+        hotelRepository.deleteById(id);
+        return "Hotel deleted successfully";
+    }
 }

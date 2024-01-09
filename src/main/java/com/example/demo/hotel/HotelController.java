@@ -30,4 +30,9 @@ public class HotelController {
         return hotelService.addNewHotel(hotel);
     }
 
+    @DeleteMapping(path =  "/{id}")
+    public String deleteHotel(@PathVariable Long id) {
+        return hotelService.deleteHotelById(id);
+    }
+
 }
