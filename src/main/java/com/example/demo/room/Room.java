@@ -27,23 +27,20 @@ public class Room {
     private int numBeds;
 
     private double price;
-    private boolean availability;
 
-    public Room(Long id, Hotel hotel, String roomType, int numBeds, double price, boolean availability) {
+    public Room(Long id, Hotel hotel, String roomType, int numBeds, double price) {
         this.id = id;
         this.hotel = hotel;
         this.roomType = roomType;
         this.numBeds = numBeds;
         this.price = price;
-        this.availability = availability;
     }
 
-    public Room(Hotel hotel, String roomType, int numBeds, double price, boolean availability) {
+    public Room(Hotel hotel, String roomType, int numBeds, double price) {
         this.hotel = hotel;
         this.roomType = roomType;
         this.numBeds = numBeds;
         this.price = price;
-        this.availability = availability;
     }
 
     public Room() {
@@ -86,13 +83,7 @@ public class Room {
         this.price = price;
     }
 
-    public boolean isAvailability() {
-        return availability;
-    }
 
-    public void setAvailability(boolean availability) {
-        this.availability = availability;
-    }
 
     @Override
     public String toString() {
@@ -102,7 +93,6 @@ public class Room {
                 ", roomType='" + roomType + '\'' +
                 ", numBeds=" + numBeds +
                 ", price=" + price +
-                ", availability=" + availability +
                 '}';
     }
 }

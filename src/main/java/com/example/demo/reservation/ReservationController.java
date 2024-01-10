@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "api/v1/reservations")
@@ -36,6 +37,12 @@ public class ReservationController {
     public String deleteReservation(@PathVariable Long id) {
         return reservationService.deleteReservationById(id);
     }
+    // creating a new reservation with room_id, agency_id, login and password
+    @PostMapping("/create")
+    public String createNewReservation(@RequestBody Map<String, Object> newReservation) {
+        return reservationService.createNewReservation(newReservation);
+    }
+
 
 //    // Custom endpoint for finding overlapping reservations
 //    @GetMapping("/overlapping")
