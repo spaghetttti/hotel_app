@@ -93,4 +93,16 @@ public class Room {
     public void setAvailability(boolean availability) {
         this.availability = availability;
     }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "id=" + id +
+                ", hotel=" + hotel +
+                ", roomType='" + roomType + '\'' +
+                ", numBeds=" + numBeds +
+                ", price=" + price +
+                ", availability=" + availability +
+                '}';
+    }
 }
