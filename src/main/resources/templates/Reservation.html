@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation Form</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h2>Reservation Form</h2>
+    <form id="reservationForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="creditCard">Credit Card:</label>
+            <input type="text" class="form-control" id="creditCard" name="credit_card" required>
+        </div>
+        <div class="form-group">
+            <label for="startDate">Start Date:</label>
+            <input type="date" class="form-control" id="startDate" name="start_date" required>
+        </div>
+        <div class="form-group">
+            <label for="endDate">End Date:</label>
+            <input type="date" class="form-control" id="endDate" name="end_date" required>
+        </div>
+        <div class="form-group">
+            <label for="guests">Number of Guests:</label>
+            <input type="number" class="form-control" id="guests" name="guests_num" required>
+        </div>
+        <div class="form-group">
+            <label for="agencyId">Agency ID:</label>
+            <input type="text" class="form-control" id="agencyId" name="agency_id" required>
+        </div>
+        <div class="form-group">
+            <label for="agencyLogin">Agency Login:</label>
+            <input type="text" class="form-control" id="agencyLogin" name="agency_login" required>
+        </div>
+        <div class="form-group">
+            <label for="agencyPassword">Agency Password:</label>
+            <input type="password" class="form-control" id="agencyPassword" name="agency_password" required>
+        </div>
+        <div class="form-group">
+            <label for="roomId">Room ID:</label>
+            <input type="text" class="form-control" id="roomId" name="room_id" required>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="submitReservationForm()">Submit</button>
+    </form>
+
+    <div id="reservationResult" class="mt-4"></div>
+</div>
+
+<!-- Include Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+<script>
+    function submitReservationForm() {
+        const form = document.getElementById('reservationForm');
+
+        // Create the JSON object with the required structure
+        const jsonData = {
+            name: form.elements['name'].value,
+            credit_card: form.elements['creditCard'].value,
+            start_date: form.elements['startDate'].value,
+            end_date: form.elements['endDate'].value,
+            guests_num: parseInt(form.elements['guests'].value),
+            agency_id: form.elements['agencyId'].value,
+            agency_login: form.elements['agencyLogin'].value,
+            agency_password: form.elements['agencyPassword'].value,
+            room_id: form.elements['roomId'].value,
+        };
+
+        fetch('http://localhost:8080/api/v1/reservations/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jsonData),
+        })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('reservationResult').innerText = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+</body>
+</html>
