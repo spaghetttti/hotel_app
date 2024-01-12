@@ -146,10 +146,6 @@ public class Hotel {
         return agency;
     }
 
-    public void setAgency(Agency agency) {
-        this.agency = agency;
-    }
-
     @Override
     public String toString() {
         return "Hotel{" +

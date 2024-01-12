@@ -63,20 +63,17 @@ public class ReservationService {
             return new ResponseEntity<>(
                     "Sorry no agency correspond to such id",
                     HttpStatus.BAD_REQUEST);
-//            throw new IllegalArgumentException("Sorry no agency correspond to such id");
         }
 
         Agency foundAgency = optionalAgency.get();
         String agencyLogin = newReservationInfo.get("agency_login").toString();
         if (!foundAgency.getLoginUsername().equals(agencyLogin)) {
-//            return "Sorry your agency login is not correct";
             return new ResponseEntity<>(
                     "Sorry your agency login is not correct",
                     HttpStatus.BAD_REQUEST);
         }
         String agencyPassword = newReservationInfo.get("agency_password").toString();
         if (!PasswordHasher.verifyPassword(agencyPassword, foundAgency.getPassword())) {
-//            return "Sorry your agency password is not correct";
             return new ResponseEntity<>(
                     "Sorry your agency password is not correct",
                     HttpStatus.BAD_REQUEST);
@@ -84,14 +81,12 @@ public class ReservationService {
         Long roomId = Long.valueOf(newReservationInfo.get("room_id").toString());
         Optional<Room> optionalRoom = roomRepository.findById(roomId);
         if (optionalRoom.isEmpty()) {
-//            return "Sorry no room correspond to such id";
             return new ResponseEntity<>(
                     "Sorry no room correspond to such id",
                     HttpStatus.BAD_REQUEST);
         }
         Room foundRoom = optionalRoom.get();
         if (!foundRoom.getHotel().getAgency().getId().equals(agencyId)) {
-//            return "Sorry this hotel doesn't collaborate with your agency";
             return new ResponseEntity<>(
                     "Sorry this hotel doesn't collaborate with your agency",
                     HttpStatus.BAD_REQUEST);
@@ -115,12 +110,16 @@ public class ReservationService {
         return originalPrice * (1 - (discountPercentage / 100));
     }
 
-    public String deleteReservationById(Long id) {
+    public ResponseEntity<String> deleteReservationById(Long id) {
         if (!reservationRepository.existsById(id)) {
-            throw new IllegalArgumentException("Reservation with id " + id + " doesn't exist");
+            return  new ResponseEntity<>(
+                    "Reservation with id " + id + " doesn't exist",
+                    HttpStatus.BAD_REQUEST);
         }
         reservationRepository.deleteById(id);
-        return "Reservation deleted successfully";
+        return new ResponseEntity<>(
+                "Reservation deleted successfully",
+                HttpStatus.OK);
     }
 
     public List<Room> roomsLookup(Map<String, Object> lookupInfo) {
@@ -137,6 +136,42 @@ public class ReservationService {
 
         filterRoomsByAgency.forEach(room -> room.setPrice(applyDiscount(room.getPrice(), foundAgency.getDiscount())));
         return filterRoomsByAgency;
+    }
+
+    public ResponseEntity<String> updateReservation(Long id, Reservation reservationInfo) {
+
+        Optional<Reservation> reservationToUpdate = reservationRepository.findById(id);
+        if (reservationToUpdate.isEmpty()) {
+            return new ResponseEntity<>(
+                    "Reservation with id " + id + " doesn't exist",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        // Check for overlapping reservations for the same room and overlapping dates
+        List<Reservation> existingReservations = reservationRepository.findOverlappingReservations(
+                id,
+                reservationInfo.getStartDate(),
+                reservationInfo.getEndDate());
+
+        if (!existingReservations.isEmpty()) {
+            return new ResponseEntity<>(
+                    "Overlapping reservation exists for the selected dates and room",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        Reservation exitingReservation = reservationToUpdate.get();
+
+        Optional.ofNullable(reservationInfo.getStartDate()).ifPresent(exitingReservation::setStartDate);
+        Optional.ofNullable(reservationInfo.getEndDate()).ifPresent(exitingReservation::setEndDate);
+        Optional.ofNullable(reservationInfo.getGuestName()).ifPresent(exitingReservation::setGuestName);
+        Optional.ofNullable(reservationInfo.getCreditCardInfo()).ifPresent(exitingReservation::setCreditCardInfo);
+        Optional.ofNullable(reservationInfo.getNumberOfGuests()).filter(numOfGuests -> numOfGuests > 0 && numOfGuests <= 1000).ifPresent(exitingReservation::setNumberOfGuests);
+
+        reservationRepository.save(exitingReservation);
+
+        return new ResponseEntity<>(
+                "Reservation updated successfully",
+                HttpStatus.OK);
     }
 
 }

@@ -49,8 +49,10 @@ public class AgencyService {
         Agency existingAgency = agencyToUpdateOptional.get();
 
         // Update agency information based on agencyInfo
-        // Example: Optional.ofNullable(agencyInfo.getName()).ifPresent(existingAgency::setName);
-        // Add similar lines for other agency properties
+        Optional.ofNullable(agencyInfo.getName()).ifPresent(existingAgency::setName);
+        Optional.ofNullable(agencyInfo.getDiscount()).filter(price -> price > 0 && price <= 100).ifPresent(existingAgency::setDiscount);
+        Optional.ofNullable(agencyInfo.getLoginUsername()).ifPresent(existingAgency::setLoginUsername);
+        Optional.ofNullable(agencyInfo.getPassword()).ifPresent(existingAgency::setPassword);
 
         agencyRepository.save(existingAgency); // Save the updated agency
 

@@ -1,5 +1,6 @@
 package com.example.demo.reservation;
 
+import com.example.demo.agency.Agency;
 import com.example.demo.room.Room;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteReservation(@PathVariable Long id) {
+    public ResponseEntity<String> deleteReservation(@PathVariable Long id) {
         return reservationService.deleteReservationById(id);
     }
 
@@ -52,11 +53,8 @@ public class ReservationController {
         return reservationService.roomsLookup(lookupInfo);
     }
 
-//    // Custom endpoint for finding overlapping reservations
-//    @GetMapping("/overlapping")
-//    public List<Reservation> findOverlappingReservations(@RequestParam Long roomId,
-//                                                         @RequestParam LocalDate startDate,
-//                                                         @RequestParam LocalDate endDate) {
-//        return reservationService.findOverlappingReservations(roomId, startDate, endDate);
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateAgency(@PathVariable Long id, @RequestBody Reservation reservationInfo) {
+        return reservationService.updateReservation(id, reservationInfo);
+    }
 }

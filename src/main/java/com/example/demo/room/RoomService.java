@@ -45,9 +45,10 @@ public class RoomService {
         Room existingRoom = roomToUpdateOptional.get();
 
         // Update room information based on roomInfo
-        // You can use a similar approach as in the HotelService's updateHotel method
-        // Example: Optional.ofNullable(roomInfo.getRoomNumber()).ifPresent(existingRoom::setRoomNumber);
-        // Add similar lines for other room properties
+        Optional.ofNullable(roomInfo.getRoomType()).ifPresent(existingRoom::setRoomType);
+        Optional.ofNullable(roomInfo.getPrice()).filter(price -> price > 0 && price <= 100000).ifPresent(existingRoom::setPrice);
+        Optional.of(roomInfo.getNumBeds()).filter(beds -> beds > 0 && beds <= 100).ifPresent(existingRoom::setNumBeds);
+
 
         roomRepository.save(existingRoom); // Save the updated room
 
