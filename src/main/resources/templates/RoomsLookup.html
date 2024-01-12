@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Lookup Form</title>
+</head>
+<body>
+<h2>Room Lookup Form</h2>
+<form id="lookupForm">
+    <label for="guests">Number of Guests:</label>
+    <input type="number" id="guests" name="guests" required><br>
+
+    <label for="agencyLogin">Agency Login:</label>
+    <input type="text" id="agencyLogin" name="agencyLogin" required><br>
+
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" name="startDate" required><br>
+
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" name="endDate" required><br>
+
+    <button type="button" onclick="submitForm()">Submit</button>
+</form>
+
+<script>
+    function submitForm() {
+        const form = document.getElementById('lookupForm');
+
+
+        // Create the JSON object with the required structure
+        const jsonData = {
+            start_date: form.elements['startDate'].value,
+            end_date: form.elements['endDate'].value,
+            guests_num: parseInt(form.elements['guests'].value),
+            agency_login: form.elements['agencyLogin'].value,
+        };
+
+
+        fetch('http://localhost:8080/api/v1/reservations/find-rooms', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jsonData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response data as needed
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping(path = "api/v1/reservations")
 public class ReservationController {
 
@@ -46,7 +47,7 @@ public class ReservationController {
         return reservationService.createNewReservation(newReservation);
     }
 
-    @GetMapping("/find-rooms")
+    @PostMapping("/find-rooms")
     public List<Room> findRooms(@RequestBody  Map<String, Object> lookupInfo) {
         return reservationService.roomsLookup(lookupInfo);
     }
