@@ -4,29 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Room Lookup Form</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 </head>
 <body>
-<h2>Room Lookup Form</h2>
-<form id="lookupForm">
-    <label for="guests">Number of Guests:</label>
-    <input type="number" id="guests" name="guests" required><br>
+<div class="container">
+    <h2>Room Lookup Form</h2>
+    <form id="lookupForm">
+        <div class="form-group">
+            <label for="guests">Number of Guests:</label>
+            <input type="number" class="form-control" id="guests" name="guests" required>
+        </div>
+        <div class="form-group">
+            <label for="agencyLogin">Agency Login:</label>
+            <input type="text" class="form-control" id="agencyLogin" name="agencyLogin" required>
+        </div>
+        <div class="form-group">
+            <label for="startDate">Start Date:</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" required>
+        </div>
+        <div class="form-group">
+            <label for="endDate">End Date:</label>
+            <input type="date" class="form-control" id="endDate" name="endDate" required>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
+    </form>
 
-    <label for="agencyLogin">Agency Login:</label>
-    <input type="text" id="agencyLogin" name="agencyLogin" required><br>
+    <table class="table mt-4">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Hotel</th>
+            <th>Number of beds</th>
+            <th>Room type</th>
+            <th>Price €</th>
+        </tr>
+        </thead>
+        <tbody id="dataBody">
+        <!-- Table body will be populated dynamically -->
+        </tbody>
+    </table>
+</div>
 
-    <label for="startDate">Start Date:</label>
-    <input type="date" id="startDate" name="startDate" required><br>
-
-    <label for="endDate">End Date:</label>
-    <input type="date" id="endDate" name="endDate" required><br>
-
-    <button type="button" onclick="submitForm()">Submit</button>
-</form>
+<!-- Include Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
 <script>
     function submitForm() {
         const form = document.getElementById('lookupForm');
-
 
         // Create the JSON object with the required structure
         const jsonData = {
@@ -35,7 +62,6 @@
             guests_num: parseInt(form.elements['guests'].value),
             agency_login: form.elements['agencyLogin'].value,
         };
-
 
         fetch('http://localhost:8080/api/v1/reservations/find-rooms', {
             method: 'POST',
@@ -46,8 +72,37 @@
         })
             .then(response => response.json())
             .then(data => {
-                // Handle the response data as needed
-                console.log(data);
+                // Clear existing table data
+                document.getElementById('dataBody').innerHTML = '';
+
+                // Loop through the response data and populate the table
+                data.forEach(item => {
+                    console.log(item);
+                    let row = document.createElement('tr');
+
+                    let idCell = document.createElement('td');
+                    idCell.textContent = item.id;
+                    row.appendChild(idCell);
+
+                    let HotelNameCell = document.createElement('td');
+                    HotelNameCell.textContent = item.hotel.name;
+                    row.appendChild(HotelNameCell);
+
+                    let numBedsCell = document.createElement('td');
+                    numBedsCell.textContent = item.numBeds;
+                    row.appendChild(numBedsCell);
+
+                    let roomTypeCell = document.createElement('td');
+                    roomTypeCell.textContent = item.roomType;
+                    row.appendChild(roomTypeCell);
+
+                    let priceCell = document.createElement('td');
+                    priceCell.textContent = item.price;
+                    row.appendChild(priceCell);
+
+                    document.getElementById('dataBody').appendChild(row);
+                });
+
             })
             .catch(error => {
                 console.error('Error:', error);
