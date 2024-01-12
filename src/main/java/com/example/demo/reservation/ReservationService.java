@@ -2,16 +2,18 @@ package com.example.demo.reservation;
 import com.example.demo.PasswordHasher;
 import com.example.demo.agency.Agency;
 import com.example.demo.agency.AgencyRepository;
-import com.example.demo.agency.AgencyService;
 import com.example.demo.room.Room;
 import com.example.demo.room.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class ReservationService {
@@ -35,7 +37,7 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
     }
 
-    public String addNewReservation(Reservation newReservation) {
+    public ResponseEntity<String> addNewReservation(Reservation newReservation) {
         // Check for overlapping reservations for the same room and overlapping dates
         List<Reservation> existingReservations = reservationRepository.findOverlappingReservations(
                 newReservation.getRoom().getId(),
@@ -43,45 +45,57 @@ public class ReservationService {
                 newReservation.getEndDate());
 
         if (!existingReservations.isEmpty()) {
-            throw new IllegalArgumentException("Overlapping reservation exists for the selected dates and room");
-        }
-
-        // Apply agency discount if applicable
-        Agency agency = newReservation.getAgency();
-        if (agency != null && !agency.getPricingPolicy().equals("0")) {
-            // Apply discount logic here
-            // For example, if agency discount is 10%, modify the price accordingly
-//            double originalPrice = calculateReservationPrice(newReservation);
-//            double discountedPrice = applyDiscount(originalPrice, agency.getDiscount());
-//            newReservation.setPrice(discountedPrice);
-            newReservation.getRoom().setPrice(newReservation.getRoom().getPrice() - Double.parseDouble(agency.getPricingPolicy()));
-            //???? this doesn't make sense , apply actual discount logic later!!!
-        } else {
-            // If no discount, set the price as usual
-//            newReservation.setPrice(calculateReservationPrice(newReservation));
+            return new ResponseEntity<>(
+                    "Overlapping reservation exists for the selected dates and room",
+                    HttpStatus.BAD_REQUEST);
         }
 
         reservationRepository.save(newReservation);
-        return "New reservation has been created";
+        return new ResponseEntity<>(
+                "New reservation has been created",
+                HttpStatus.OK);
     }
 
-    public String createNewReservation(Map<String, Object> newReservationInfo) {
-        Optional<Agency> optionalAgency = agencyRepository.findById(Long.valueOf(newReservationInfo.get("agency_id").toString()));
+    public ResponseEntity<String> createNewReservation(Map<String, Object> newReservationInfo) {
+        Long agencyId = Long.valueOf(newReservationInfo.get("agency_id").toString());
+        Optional<Agency> optionalAgency = agencyRepository.findById(agencyId);
         if (optionalAgency.isEmpty()) {
-            return "Sorry no agency correspond to such id";
+            return new ResponseEntity<>(
+                    "Sorry no agency correspond to such id",
+                    HttpStatus.BAD_REQUEST);
+//            throw new IllegalArgumentException("Sorry no agency correspond to such id");
         }
+
         Agency foundAgency = optionalAgency.get();
-        if (!foundAgency.getLoginUsername().equals(newReservationInfo.get("agency_login"))) {
-            return "Sorry your agency login is not correct";
+        String agencyLogin = newReservationInfo.get("agency_login").toString();
+        if (!foundAgency.getLoginUsername().equals(agencyLogin)) {
+//            return "Sorry your agency login is not correct";
+            return new ResponseEntity<>(
+                    "Sorry your agency login is not correct",
+                    HttpStatus.BAD_REQUEST);
         }
-        if (!PasswordHasher.verifyPassword(newReservationInfo.get("agency_password").toString(), foundAgency.getPassword())) {
-            return "Sorry your agency password is not correct";
+        String agencyPassword = newReservationInfo.get("agency_password").toString();
+        if (!PasswordHasher.verifyPassword(agencyPassword, foundAgency.getPassword())) {
+//            return "Sorry your agency password is not correct";
+            return new ResponseEntity<>(
+                    "Sorry your agency password is not correct",
+                    HttpStatus.BAD_REQUEST);
         }
-        Optional<Room> optionalRoom = roomRepository.findById(Long.valueOf(newReservationInfo.get("room_id").toString()));
+        Long roomId = Long.valueOf(newReservationInfo.get("room_id").toString());
+        Optional<Room> optionalRoom = roomRepository.findById(roomId);
         if (optionalRoom.isEmpty()) {
-            return "Sorry no room correspond to such id";
+//            return "Sorry no room correspond to such id";
+            return new ResponseEntity<>(
+                    "Sorry no room correspond to such id",
+                    HttpStatus.BAD_REQUEST);
         }
         Room foundRoom = optionalRoom.get();
+        if (!foundRoom.getHotel().getAgency().getId().equals(agencyId)) {
+//            return "Sorry this hotel doesn't collaborate with your agency";
+            return new ResponseEntity<>(
+                    "Sorry this hotel doesn't collaborate with your agency",
+                    HttpStatus.BAD_REQUEST);
+        }
         Reservation newReservation = new Reservation(
                 foundRoom,
                 foundAgency,
@@ -95,12 +109,6 @@ public class ReservationService {
         return addNewReservation(newReservation);
     }
 
-    private double calculateReservationPrice(Reservation reservation) {
-        // Add your logic here to calculate the price based on the reservation details
-        // For example: price per night * number of nights * number of guests
-        // This is a placeholder and needs to be replaced with your actual pricing logic
-        return 0.0; // Placeholder for price calculation
-    }
 
     private double applyDiscount(double originalPrice, double discountPercentage) {
         // Apply the discount to the original price
@@ -114,4 +122,21 @@ public class ReservationService {
         reservationRepository.deleteById(id);
         return "Reservation deleted successfully";
     }
+
+    public List<Room> roomsLookup(Map<String, Object> lookupInfo) {
+        int guests = Integer.parseInt(lookupInfo.get("guests_num").toString());
+        String agencyLogin = lookupInfo.get("agency_login").toString();
+        Agency foundAgency = agencyRepository.findByLoginUsername(agencyLogin).orElseThrow();
+
+        List<Room> roomList = roomRepository.roomsLookup(guests);
+        Stream<Room> roomStream = roomList.stream();
+
+        List<Room> filteredRooms = roomStream.filter(room -> room.getHotel().getAgency().getLoginUsername().equals(agencyLogin)).toList();
+
+        List<Room> filterRoomsByAgency = filteredRooms.stream().filter(room -> reservationRepository.findOverlappingReservations(room.getId(), LocalDate.parse(lookupInfo.get("start_date").toString()),  LocalDate.parse(lookupInfo.get("end_date").toString())).isEmpty()).toList();
+
+        filterRoomsByAgency.forEach(room -> room.setPrice(applyDiscount(room.getPrice(), foundAgency.getDiscount())));
+        return filterRoomsByAgency;
+    }
+
 }

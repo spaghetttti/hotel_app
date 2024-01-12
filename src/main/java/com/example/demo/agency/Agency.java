@@ -18,21 +18,21 @@ public class Agency {
     )
     private Long id;
     private String name;
-    private String pricingPolicy;
+    private Double discount;
     private String loginUsername;
     private String password;
 
-    public Agency(Long id, String name, String pricingPolicy, String loginUsername, String password) {
+    public Agency(Long id, String name, Double discount, String loginUsername, String password) {
         this.id = id;
         this.name = name;
-        this.pricingPolicy = pricingPolicy;
+        this.discount = discount;
         this.loginUsername = loginUsername;
         this.password = password;
     }
 
-    public Agency(String name, String pricingPolicy, String loginUsername, String password) {
+    public Agency(String name, Double discount, String loginUsername, String password) {
         this.name = name;
-        this.pricingPolicy = pricingPolicy;
+        this.discount = discount;
         this.loginUsername = loginUsername;
         this.password = password;
     }
@@ -51,12 +51,12 @@ public class Agency {
         this.name = name;
     }
 
-    public String getPricingPolicy() {
-        return pricingPolicy;
+    public Double getDiscount() {
+        return discount;
     }
 
-    public void setPricingPolicy(String pricingPolicy) {
-        this.pricingPolicy = pricingPolicy;
+    public void setDiscount(Double discount) {
+        this.discount = discount;
     }
 
     public String getLoginUsername() {
@@ -80,7 +80,7 @@ public class Agency {
         return "Agency{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", pricingPolicy='" + pricingPolicy + '\'' +
+                ", discount='" + discount + '\'' +
                 ", loginUsername='" + loginUsername + '\'' +
                 ", password='" + password + '\'' +
                 '}';

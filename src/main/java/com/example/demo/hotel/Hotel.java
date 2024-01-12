@@ -1,5 +1,6 @@
 package com.example.demo.hotel;
 
+import com.example.demo.agency.Agency;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,6 +16,7 @@ public class Hotel {
             strategy = GenerationType.SEQUENCE,
             generator = "hotel_sequence"
     )
+
     private Long id;
     private String name;
     private String country;
@@ -24,10 +26,12 @@ public class Hotel {
     private int starRating;
     private String contactInfo;
     private String gpsLocation;
-
     private int roomsNumber;
+    @ManyToOne
+    @JoinColumn(name = "agency_id")
+    private Agency agency;
 
-    public Hotel(Long id, String name, String country, String city, String street, String number, int starRating, String contactInfo, String gpsLocation, int roomsNumber) {
+    public Hotel(Long id, String name, String country, String city, String street, String number, int starRating, String contactInfo, String gpsLocation, int roomsNumber, Agency agency) {
         this.id = id;
         this.name = name;
         this.country = country;
@@ -38,9 +42,10 @@ public class Hotel {
         this.contactInfo = contactInfo;
         this.gpsLocation = gpsLocation;
         this.roomsNumber = roomsNumber;
+        this.agency = agency;
     }
 
-    public Hotel(String name, String country, String city, String street, String number, int starRating, String contactInfo, String gpsLocation, int roomsNumber) {
+    public Hotel(String name, String country, String city, String street, String number, int starRating, String contactInfo, String gpsLocation, int roomsNumber, Agency agency) {
         this.name = name;
         this.country = country;
         this.city = city;
@@ -50,6 +55,7 @@ public class Hotel {
         this.contactInfo = contactInfo;
         this.gpsLocation = gpsLocation;
         this.roomsNumber = roomsNumber;
+        this.agency = agency;
     }
 
     public Hotel() {
@@ -136,6 +142,14 @@ public class Hotel {
         this.roomsNumber = roomsNumber;
     }
 
+    public Agency getAgency() {
+        return agency;
+    }
+
+    public void setAgency(Agency agency) {
+        this.agency = agency;
+    }
+
     @Override
     public String toString() {
         return "Hotel{" +
@@ -149,6 +163,7 @@ public class Hotel {
                 ", contactInfo='" + contactInfo + '\'' +
                 ", gpsLocation='" + gpsLocation + '\'' +
                 ", roomsNumber=" + roomsNumber +
+                ", agency=" + agency +
                 '}';
     }
 }
