@@ -34,7 +34,9 @@ public class RoomService {
 
     public ResponseEntity<String> deleteRoomById(Long id) {
         if (!roomRepository.existsById(id)) {
-            throw new IllegalArgumentException("Room with id " + id + " doesn't exist");
+            return new ResponseEntity<>(
+                    "Room with id " + id + " doesn't exist",
+                    HttpStatus.BAD_REQUEST);
         }
         roomRepository.deleteById(id);
         return new ResponseEntity<>(
