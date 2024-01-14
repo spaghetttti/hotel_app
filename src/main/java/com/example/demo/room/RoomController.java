@@ -1,6 +1,7 @@
 package com.example.demo.room;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,17 +27,17 @@ public class RoomController {
     }
 
     @PostMapping
-    public String addNewRoom(@RequestBody Room room) {
+    public ResponseEntity<String> addNewRoom(@RequestBody Room room) {
         return roomService.addNewRoom(room);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteRoom(@PathVariable Long id) {
+    public ResponseEntity<String> deleteRoom(@PathVariable Long id) {
         return roomService.deleteRoomById(id);
     }
 
     @PutMapping("/{id}")
-    public String updateRoom(@PathVariable Long id, @RequestBody Room roomInfo) {
+    public ResponseEntity<String> updateRoom(@PathVariable Long id, @RequestBody Room roomInfo) {
         return roomService.updateRoom(id, roomInfo);
     }
 }

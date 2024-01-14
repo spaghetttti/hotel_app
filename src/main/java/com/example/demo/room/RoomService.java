@@ -1,6 +1,8 @@
 package com.example.demo.room;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,23 +25,29 @@ public class RoomService {
         return roomRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Room not found"));
     }
 
-    public String addNewRoom(Room newRoom) {
+    public ResponseEntity<String> addNewRoom(Room newRoom) {
         roomRepository.save(newRoom);
-        return "New room has been created";
+        return new ResponseEntity<>(
+                "New room has been created",
+                HttpStatus.OK);
     }
 
-    public String deleteRoomById(Long id) {
+    public ResponseEntity<String> deleteRoomById(Long id) {
         if (!roomRepository.existsById(id)) {
             throw new IllegalArgumentException("Room with id " + id + " doesn't exist");
         }
         roomRepository.deleteById(id);
-        return "Room deleted successfully";
+        return new ResponseEntity<>(
+                "Room deleted successfully",
+                HttpStatus.OK);
     }
 
-    public String updateRoom(Long id, Room roomInfo) {
+    public ResponseEntity<String> updateRoom(Long id, Room roomInfo) {
         Optional<Room> roomToUpdateOptional = roomRepository.findById(id);
         if (roomToUpdateOptional.isEmpty()) {
-            throw new IllegalArgumentException("Room with id " + id + " doesn't exist");
+            return new ResponseEntity<>(
+                    "Room with id " + id + " doesn't exist",
+                    HttpStatus.BAD_REQUEST);
         }
 
         Room existingRoom = roomToUpdateOptional.get();
@@ -51,7 +59,8 @@ public class RoomService {
 
 
         roomRepository.save(existingRoom); // Save the updated room
-
-        return "Room updated successfully";
+        return new ResponseEntity<>(
+                "Room updated successfully",
+                HttpStatus.OK);
     }
 }

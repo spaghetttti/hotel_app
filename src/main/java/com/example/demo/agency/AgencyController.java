@@ -1,5 +1,6 @@
 package com.example.demo.agency;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,17 +27,17 @@ public class AgencyController {
     }
 
     @PostMapping
-    public String addNewAgency(@RequestBody Agency agency) {
+    public ResponseEntity<String> addNewAgency(@RequestBody Agency agency) {
         return agencyService.addNewAgency(agency);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteAgency(@PathVariable Long id) {
+    public ResponseEntity<String> deleteAgency(@PathVariable Long id) {
         return agencyService.deleteAgencyById(id);
     }
 
     @PutMapping("/{id}")
-    public String updateAgency(@PathVariable Long id, @RequestBody Agency agencyInfo) {
+    public ResponseEntity<String> updateAgency(@PathVariable Long id, @RequestBody Agency agencyInfo) {
         return agencyService.updateAgency(id, agencyInfo);
     }
 }
